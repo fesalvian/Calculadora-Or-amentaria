@@ -37,9 +37,10 @@ export default function HomePage() {
 
   // Itens estáticos para teste
 const staticItems: Item[] = [
-  { id: 1, name: 'Parafuso', unit_value: 0.5 },
-  { id: 2, name: 'Porca', unit_value: 0.3 },
-  { id: 3, name: 'Arruela', unit_value: 0.2 }
+  { id: 1, name: 'Dobradiça', unit_value: 5.0 },
+  { id: 2, name: 'Corrediça (par)', unit_value: 20.0 },
+  { id: 3, name: 'Pistão', unit_value:15.0 },
+  { id: 4, name: 'Trilho (metro)', unit_value:30.0 }
 ];
 
 // Inicializa itens com valores estáticos
