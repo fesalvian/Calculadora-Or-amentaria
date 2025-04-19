@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useRef, FormEvent } from "react";
 import api from "../api";
 import { Item } from "../types";
+import { Link } from 'react-router-dom';
 
 interface BudgetLine {
   id: number;
@@ -134,13 +135,13 @@ useEffect(() => {
     <div className={`profile-menu${open ? ' open' : ''}`}>
       <ul>
         <li>
-          <a href="#">Editar Perfil</a>
+        <Link to="/perfil">Editar Perfil</Link>
         </li>
         <li>
-          <a href="#">Itens</a>
+        <Link to="/items" className="menu-link">Itens</Link>
         </li>
         <li>
-          <a href="#">Orçamentos</a>
+        <Link to="/orcamentos">Orçamentos</Link>
         </li>
         <li>
           <button>Logout</button>
