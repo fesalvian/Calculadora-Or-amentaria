@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import ItemsPage from "./pages/ItemsPage";
 import HomePage from './pages/HomePage';
 import "./css/global.css";
+import "./css/home.css";
 
 // depois, quando tiver, importe CalculatorPage, BudgetsPage, SettingsPage
 

@@ -1,5 +1,5 @@
 // src/pages/HomePage.tsx
-import React, { useState, useEffect, FormEvent } from "react";
+import React, { useState, useEffect, useRef, FormEvent } from "react";
 import api from "../api";
 import { Item } from "../types";
 
@@ -18,6 +18,8 @@ export default function HomePage() {
   const [clientName, setClientName] = useState<string>("");
   const [clientPhone, setClientPhone] = useState<string>("");
   const [lines, setLines] = useState<BudgetLine[]>([]);
+  const [open, setOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
 
   // Formata valor para R$00,00
   const formatCurrency = (value: number) =>
@@ -102,12 +104,53 @@ useEffect(() => {
     );
   };
 
+  // Fecha o menu ao clicar fora
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
   return (
     <div className="container">
-      <header>
-        <h1>Calculadora de Orçamento</h1>
-        <div className="avatar-icon">👤</div>
-      </header>
+      <header className="header">
+  <div className="header-left">
+    <h1>Calculadora de Orçamento</h1>
+  </div>
+
+  <div className="header-right" ref={menuRef}>
+    <button
+      onClick={() => setOpen(o => !o)}
+      className="avatar-icon"
+      aria-label="Abrir menu de perfil"
+    >
+      👤
+    </button>
+
+    <div className={`profile-menu${open ? ' open' : ''}`}>
+      <ul>
+        <li>
+          <a href="#">Editar Perfil</a>
+        </li>
+        <li>
+          <a href="#">Itens</a>
+        </li>
+        <li>
+          <a href="#">Orçamentos</a>
+        </li>
+        <li>
+          <button>Logout</button>
+        </li>
+      </ul>
+    </div>
+  </div>
+</header>
+
+
 
       {/* Seção Clientes */}
       <h1 className="text-xl font-semibold mt-4">Clientes</h1>

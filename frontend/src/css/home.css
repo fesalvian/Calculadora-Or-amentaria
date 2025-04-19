@@ -1,0 +1,123 @@
+header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    background-color: var(--bg-light);
+    box-shadow: var(--shadow-card);
+    border-bottom: 2px solid var(--secondary-color);
+  }
+  .header-left h1 {
+    margin: 0;
+    font-size: 1.5rem;
+  }
+  .avatar-icon {
+    width: 2.5rem;
+    height: 2.5rem;
+    background-color: var(--secondary-color);
+    color: var(--bg-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    font-size: 1.25rem;
+  }
+  
+  /* Off-canvas menu */
+  .profile-menu {
+    position: fixed;
+    top: 0;
+    right: -100%;
+    width: 80%;
+    max-width: 300px;
+    height: 100%;
+    background-color: #fff;
+    box-shadow: -2px 0 8px rgba(0, 0, 0, 0.2);
+    transition: right 0.3s ease-in-out;
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    background-color: var(--secondary-color);
+  }
+  .profile-menu.open {
+    right: 0;
+  }
+  .profile-menu ul {
+    list-style: none;
+    margin: 0;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  .profile-menu a,
+  .profile-menu button {
+    display: block;
+    width: 100%;
+    padding: 0.75rem 1rem;
+    text-align: left;
+    background-color: #F3F4F6;
+    border: none;
+    border-radius: 0.25rem;
+    transition: background-color 0.2s;
+    text-decoration: none;
+    color: var(--text-color);
+  }
+  .profile-menu a:hover,
+  .profile-menu button:hover {
+    background-color: #E1E5E9;
+  }
+  .profile-menu button {
+    color: var(--bg-light);
+    font-weight: 500;
+    background-color: var(--danger-color);
+  }
+  
+  /* Formulário */
+  form {
+    background-color: var(--bg-light);
+    border: 1px solid var(--border-color);
+    border-radius: 0.5rem;
+    box-shadow: var(--shadow-card);
+    padding: 1.25rem;
+    margin-top: 1rem;
+  }
+  form .grid {
+    display: grid;
+    gap: 1rem;
+  }
+  label {
+    display: block;
+    margin-bottom: 0.25rem;
+    font-size: 0.9rem;
+  }
+  input, select {
+    width: 100%;
+    padding: 0.65rem;
+    border: 1px solid var(--border-color);
+    border-radius: 0.25rem;
+  }
+  
+  /* Tabela */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1.25rem;
+    box-shadow: var(--shadow-card);
+    border-radius: 0.5rem;
+    overflow: hidden;
+  }
+  thead {
+    background-color: var(--secondary-color);
+    color: #fff;
+  }
+  th, td {
+    padding: 0.75rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+  }
+  tbody tr:nth-child(even) {
+    background-color: #F1F5F9;
+  }
+  
