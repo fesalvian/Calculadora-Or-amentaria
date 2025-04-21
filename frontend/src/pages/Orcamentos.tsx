@@ -27,6 +27,7 @@ export default function Orcamentos() {
   return (
     <div className="container">
     <BackButton />
+    <div className="containerInside">
       <h1>Orçamentos Salvos</h1>
 
       {/* Filtro por nome */}
@@ -88,6 +89,7 @@ export default function Orcamentos() {
       ) : (
         <p className="mt-4">Nenhum orçamento encontrado.</p>
       )}
+    </div>
     </div>
   );
 }

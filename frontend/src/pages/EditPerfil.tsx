@@ -74,6 +74,7 @@ export default function EditPerfil() {
   return (
     <div className="container">
     <BackButton />
+    <div className="containerInside">
       <h1>Editar Perfil</h1>
 
       <div style={{ marginTop: '1rem' }}>
@@ -168,6 +169,7 @@ export default function EditPerfil() {
             </button>
           </div>
         )}
+        </div>
       </div>
     </div>
   );

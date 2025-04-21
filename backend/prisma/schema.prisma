@@ -7,3 +7,50 @@ generator client {
   provider = "prisma-client-js"
 }
 
+model User {
+  id           Int       @id @default(autoincrement())
+  username     String    @unique
+  email        String    @unique
+  passwordHash String
+  logoPath     String?   // caminho para logo PNG
+  items        Item[]    
+  budgets      Budget[]  
+}
+
+model Item {
+  id          Int           @id @default(autoincrement())
+  name        String
+  unitValue   Float         @map("unit_value")
+  user        User          @relation(fields: [userId], references: [id])
+  userId      Int           @map("user_id")
+
+  // Relação inversa nomeada para BudgetItem
+  budgetItems BudgetItem[]  @relation("ItemBudgetItems")
+}
+
+model Budget {
+  id           Int           @id @default(autoincrement())
+  clientName   String        @map("client_name")
+  clientPhone  String?       @map("client_phone")
+  totalCost    Float         @map("total_cost")
+  createdAt    DateTime      @default(now()) @map("created_at")
+  user         User          @relation(fields: [userId], references: [id])
+  userId       Int           @map("user_id")
+
+  // Relação inversa nomeada para BudgetItem
+  items        BudgetItem[]  @relation("BudgetBudgetItems")
+}
+
+model BudgetItem {
+  id         Int     @id @default(autoincrement())
+  quantity   Int
+  subTotal   Float   @map("sub_total")
+
+  // ligação com Budget, mesma tag "BudgetBudgetItems"
+  budget     Budget  @relation("BudgetBudgetItems", fields: [budgetId], references: [id])
+  budgetId   Int     @map("budget_id")
+
+  // ligação com Item, mesma tag "ItemBudgetItems"
+  item       Item    @relation("ItemBudgetItems", fields: [itemId], references: [id])
+  itemId     Int     @map("item_id")
+}

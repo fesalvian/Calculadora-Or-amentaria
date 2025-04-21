@@ -80,6 +80,15 @@
     margin: 0 auto;
     padding: 1.5rem;
   }
+
+  .containerInside{
+    background-color: var(--bg-light);
+    border-radius: 0.5rem;
+    box-shadow: var(--shadow-card);
+    padding: 1.25rem;
+    margin-top: 1rem;
+    border: 1px solid var(--border-color);
+  }
   
   /* Seções */
   h1 {
