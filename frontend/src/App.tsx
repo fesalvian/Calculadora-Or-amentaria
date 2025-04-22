@@ -9,33 +9,39 @@ import Orcamentos from './pages/Orcamentos';
 import Login from './pages/Login';
 import Register from './pages/Register';
 
+function PrivateRoute({ children }: { children: JSX.Element }) {
+  const token = localStorage.getItem('token');
+  return token ? children : <Navigate to="/login" replace />;
+}
+
 // depois, quando tiver, importe CalculatorPage, BudgetsPage, SettingsPage
 
 export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* rota Login */}
+        {/* públicas */}
         <Route path="/login" element={<Login />} />
-
-        {/* rota Cadastro */}
         <Route path="/register" element={<Register />} />
 
-        {/* rota raiz */}
-        <Route path="/" element={<HomePage />} />
+        {/* privadas */}
+        <Route path="/" element={
+          <PrivateRoute>
+            <HomePage />
+          </PrivateRoute>
+        }/>
+        <Route path="/items" element={
+          <PrivateRoute><EditItem /></PrivateRoute>
+        }/>
+        <Route path="/orcamentos" element={
+          <PrivateRoute><Orcamentos /></PrivateRoute>
+        }/>
+        <Route path="/perfil" element={
+          <PrivateRoute><EditPerfil /></PrivateRoute>
+        }/>
 
-        {/* página de gerenciamento de itens */}
-        <Route path="/items" element={<EditItem />} />
-
-        {/* lista de orçamentos salvos */}
-        <Route path="/orcamentos" element={<Orcamentos />} />
-
-        {/* edição de perfil */}
-        <Route path="/perfil" element={<EditPerfil />} />
-
-        {/* redirecionamentos e fallback */}
-        <Route path="/home" element={<Navigate to="/" replace />} />
-        <Route path="*" element={<p>404 — Página não encontrada</p>} />
+        {/* fallback 404 */}
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
   );

@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useRef, FormEvent } from "react";
 import api from "../api";
 import { Item } from "../types";
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 interface BudgetLine {
   id: number;
@@ -105,6 +105,12 @@ useEffect(() => {
     );
   };
 
+  const nav = useNavigate();
+function handleLogout() {
+  localStorage.removeItem('token');
+  nav('/login', { replace: true });
+}
+
   // Fecha o menu ao clicar fora
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
@@ -144,7 +150,7 @@ useEffect(() => {
         <Link to="/orcamentos">Orçamentos</Link>
         </li>
         <li>
-          <button>Logout</button>
+        <button onClick={handleLogout} className="danger">Logout</button>
         </li>
       </ul>
     </div>

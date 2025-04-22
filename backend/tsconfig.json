@@ -1,0 +1,15 @@
+{
+    "compilerOptions": {
+      "target": "es2020",               // versão do JS de saída
+      "module": "commonjs",             // para compatibilidade com Node
+      "rootDir": "src",                 // pasta de entrada
+      "outDir": "dist",                 // onde o TS compilado vai cair
+      "esModuleInterop": true,          // habilita importação de módulos CommonJS
+      "forceConsistentCasingInFileNames": true,
+      "strict": true,                   // ativa checagens mais rígidas
+      "skipLibCheck": true              // ignora checagem de tipos em node_modules
+    },
+    "include": ["src/**/*.ts"],         // quais arquivos TS incluir
+    "exclude": ["node_modules", "dist"] // o que ignorar
+  }
+  

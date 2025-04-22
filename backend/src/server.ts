@@ -1,15 +1,19 @@
+
+import * as dotenv from 'dotenv';
+dotenv.config();
+
 import express from 'express';
 import cors from 'cors';
-import dotenv from 'dotenv';
-import prismaClient from '@prisma/client';
 import authRoutes from './routes/auth';
 import itemsRoutes from './routes/items';
 import budgetsRoutes from './routes/budgets';
 import exportRoutes from './routes/export';
 import { authenticate } from './middleware/auth';
 import path from 'path';
+import { resolve } from 'path';
+import { existsSync } from 'fs';
 
-dotenv.config();
+
 const app = express();
 app.use(cors());
 app.use(express.json());

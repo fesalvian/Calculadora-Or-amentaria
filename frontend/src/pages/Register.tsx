@@ -19,7 +19,7 @@ export default function Register() {
       return;
     }
     try {
-      await api.post("/auth/register", { name, email, password });
+      await api.post("/auth/register", { username: name, email, password });
       navigate("/login");
     } catch (err: any) {
       setError(err.response?.data?.message || "Erro ao cadastrar.");

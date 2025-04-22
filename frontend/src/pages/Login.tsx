@@ -13,8 +13,9 @@ export default function Login() {
     e.preventDefault();
     setError("");
     try {
-      await api.post("/auth/login", { email, password });
-      navigate("/");
+      const res = await api.post('/auth/login', { email, password });
+      localStorage.setItem('token', res.data.token);
+      navigate('/');    // redireciona pra HomePage
     } catch (err: any) {
       setError(err.response?.data?.message || "Erro ao efetuar login.");
     }
