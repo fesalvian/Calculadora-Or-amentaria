@@ -78,16 +78,86 @@ useEffect(() => {
 
   const totalCost = lines.reduce((sum, l) => sum + l.subTotal, 0);
 
-  // Botões de ação
-  const handleSave = () => {
-    alert("Orçamento salvo na conta!");
-  };
-  const handleExportExcel = () => {
-    alert("Exportado para Excel");
-  };
-  const handleExportPDF = () => {
-    alert("Exportado para PDF");
-  };
+   // Salva orçamento na API
+  const handleSave = async () => {
+    try {
+      const payload = {
+        client_name: clientName,
+        client_phone: clientPhone,
+        total_cost: totalCost,
+        items: lines.map(l => ({
+          itemId: l.item.id,
+          quantity: l.quantity,
+          subTotal: l.subTotal,
+        })),
+      };
+      const res = await api.post('/budgets', payload);
+      if (res.status === 200 || res.status === 201) {
+        alert('Orçamento salvo com sucesso!');
+        // limpa formulário
+        setClientName('');
+        setClientPhone('');
+        setLines([]);
+      } else {
+        alert('Erro ao salvar orçamento.');
+      }
+    } catch (err) {
+      console.error('Erro ao salvar orçamento:', err);
+      alert('Erro ao salvar orçamento.');
+    }};
+
+    const handleExportExcel = async () => {
+      try {
+        const payload = {
+          client_name: clientName,
+          client_phone: clientPhone,
+          total_cost: totalCost,
+          items: lines.map(l => ({
+            name: l.item.name,
+            quantity: l.quantity,
+            subTotal: l.subTotal
+          }))
+        };
+        const res = await api.post('/export/excel', payload, { responseType: 'blob' });
+        const blob = new Blob([res.data], { type: res.headers['content-type'] });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'orcamento.xlsx';
+        a.click();
+        window.URL.revokeObjectURL(url);
+      } catch (err) {
+        console.error(err);
+        alert('Erro ao exportar Excel');
+      }
+    };
+   
+    const handleExportPDF = async () => {
+      try {
+        const payload = {
+          client_name: clientName,
+          client_phone: clientPhone,
+          total_cost: totalCost,
+          items: lines.map(l => ({
+            name: l.item.name,
+            quantity: l.quantity,
+            subTotal: l.subTotal
+          }))
+        };
+        const res = await api.post('/export/pdf', payload, { responseType: 'blob' });
+        const blob = new Blob([res.data], { type: 'application/pdf' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'orcamento.pdf';
+        a.click();
+        window.URL.revokeObjectURL(url);
+      } catch (err) {
+        console.error(err);
+        alert('Erro ao exportar PDF');
+      }
+    };   
+
   const handleSendWhatsApp = () => {
     const textLines = lines
       .map(l => `${l.item.name} x${l.quantity} = ${formatCurrency(l.subTotal)}`)

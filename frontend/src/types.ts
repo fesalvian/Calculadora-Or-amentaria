@@ -5,3 +5,11 @@ export interface Item {
     created_at?: string;
   }
   
+  export interface Budget {
+    id: number;
+    clientName: string;
+    clientPhone?: string;
+    totalCost: number;
+    createdAt: string;
+    items: Item[];
+  }

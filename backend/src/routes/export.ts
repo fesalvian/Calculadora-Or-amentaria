@@ -1,54 +1,68 @@
+// src/routes/export.ts
 import { Router } from 'express';
-import { PrismaClient } from '@prisma/client';
-import { AuthRequest } from '../middleware/auth';
-import excelJS from 'exceljs';
+import ExcelJS from 'exceljs';
 import PDFDocument from 'pdfkit';
-import fs from 'fs';
 
-const prisma = new PrismaClient();
 const router = Router();
 
-// Exporta Excel
-router.get('/budgets/:id/excel', async (req: AuthRequest, res) => {
-  const id = Number(req.params.id);
-  const budget = await prisma.budget.findUnique({ where: { id }, include: { items: { include: { item: true } } } });
-  const workbook = new excelJS.Workbook();
-  const sheet = workbook.addWorksheet('Orçamento');
-  sheet.addRow(['Item', 'Quantidade', 'Subtotal']);
-  budget!.items.forEach(bi => {
-    sheet.addRow([bi.item.name, bi.quantity, bi.subTotal]);
-  });
-  sheet.addRow([]);
-  sheet.addRow(['Total', '', budget!.totalCost]);
+// POST /export/excel
+router.post('/excel', async (req, res) => {
+  const { client_name, client_phone, total_cost, items } = req.body;
 
-  res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-  res.setHeader('Content-Disposition', `attachment; filename=orcamento_${id}.xlsx`);
-  await workbook.xlsx.write(res);
-  res.end();
+  const workbook = new ExcelJS.Workbook();
+  const sheet = workbook.addWorksheet('Orçamento');
+
+  // Cabeçalho
+  sheet.addRow(['Cliente', client_name]);
+  if (client_phone) sheet.addRow(['Telefone', client_phone]);
+  sheet.addRow([]);
+  sheet.addRow(['Item', 'Quantidade', 'Subtotal']);
+  // Linhas
+  items.forEach((l: any) =>
+    sheet.addRow([l.name || l.itemName, l.quantity, l.subTotal])
+  );
+  sheet.addRow([]);
+  sheet.addRow(['Total', '', total_cost]);
+
+  // Gera buffer
+  const buffer = await workbook.xlsx.writeBuffer();
+  res
+    .status(200)
+    .header('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    .header('Content-Disposition', 'attachment; filename="orcamento.xlsx"')
+    .send(buffer);
 });
 
-// Exporta PDF com logo
-router.get('/budgets/:id/pdf', async (req: AuthRequest, res) => {
-  const id = Number(req.params.id);
-  const budget = await prisma.budget.findUnique({ where: { id }, include: { items: { include: { item: true } }, user: true } });
-  const doc = new PDFDocument();
-  res.setHeader('Content-Type', 'application/pdf');
-  res.setHeader('Content-Disposition', `attachment; filename=orcamento_${id}.pdf`);
+// POST /export/pdf
+router.post('/pdf', (req, res) => {
+  const { client_name, client_phone, total_cost, items } = req.body;
+  const doc = new PDFDocument({ margin: 50 });
+  // Headers HTTP
+  res
+    .status(200)
+    .header('Content-Type', 'application/pdf')
+    .header('Content-Disposition', 'attachment; filename="orcamento.pdf"');
   doc.pipe(res);
 
-  // logo
-  if (budget?.user.logoPath) {
-    doc.image(`.${budget.user.logoPath}`, 50, 50, { width: 100 });
+  doc.fontSize(18).text(`Orçamento para ${client_name}`, { underline: true });
+  if (client_phone) {
+    doc.moveDown().fontSize(12).text(`Telefone: ${client_phone}`);
   }
-  doc.fontSize(18).text('Orçamento', 50, 160);
   doc.moveDown();
 
-  // itens
-  budget!.items.forEach(bi => {
-    doc.fontSize(12).text(`${bi.item.name} x${bi.quantity} = R$${bi.subTotal.toFixed(2)}`);
+  // Tabela simples
+  doc.fontSize(12).text('Item                     Qtd    Subtotal');
+  doc.moveDown(0.5);
+  items.forEach((l: any) => {
+    const name = l.name || l.itemName;
+    doc.text(
+      `${name.padEnd(25)} ${String(l.quantity).padStart(3)}    R$${l.subTotal.toFixed(2)}`
+    );
   });
+
   doc.moveDown();
-  doc.fontSize(14).text(`Total: R$${budget!.totalCost.toFixed(2)}`);
+  doc.fontSize(14).text(`Total: R$${Number(total_cost).toFixed(2)}`, { align: 'right' });
+
   doc.end();
 });
 

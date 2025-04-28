@@ -1,55 +1,43 @@
 // src/pages/Orcamentos.tsx
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import api from "../api";
 import BackButton from "../components/BackButton";
-
-interface Budget {
-  id: number;
-  client_name: string;
-  client_phone?: string;
-  total_cost: number;
-  created_at: string;
-}
+import "../css/orcamentos.css";
+import { Budget } from "../types";
 
 export default function Orcamentos() {
   const [budgets, setBudgets] = useState<Budget[]>([]);
   const [search, setSearch] = useState<string>("");
+  const navigate = useNavigate();
 
   useEffect(() => {
-    api.get<Budget[]>("/budgets").then(res => setBudgets(res.data));
+    api.get<Budget[]>("/budgets")
+      .then(res => setBudgets(res.data))
+      .catch(err => console.error("Erro ao carregar orçamentos:", err));
   }, []);
 
   const filtered = budgets.filter(b =>
-    b.client_name.toLowerCase().includes(search.toLowerCase())
+    b.clientName.toLowerCase().includes(search.toLowerCase())
   );
 
   return (
-    <div className="container">
-    <BackButton />
-    <div className="containerInside">
-      <h1>Orçamentos Salvos</h1>
+    <div className="orcamentos-container">
+      <BackButton/>
+      <h1 className="page-title">Orçamentos Salvos</h1>
 
-      {/* Filtro por nome */}
-      <div className="mt-4">
+      <div className="search-wrapper">
         <input
           type="text"
           placeholder="Pesquisar por nome"
           value={search}
           onChange={e => setSearch(e.target.value)}
-          className=""
-          style={{
-            width: '100%',
-            padding: '0.5rem',
-            border: '1px solid var(--border-color)',
-            borderRadius: '0.25rem',
-            fontSize: '1rem'
-          }}
+          className="search-input"
         />
       </div>
 
       {filtered.length > 0 ? (
-        <table className="mt-4">
+        <table className="budget-table">
           <thead>
             <tr>
               <th>Cliente</th>
@@ -62,34 +50,30 @@ export default function Orcamentos() {
           <tbody>
             {filtered.map(b => (
               <tr key={b.id}>
-                <td>{b.client_name}</td>
-                <td>{b.client_phone || '-'}</td>
-                <td>{b.total_cost.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</td>
-                <td>{new Date(b.created_at).toLocaleDateString('pt-BR')}</td>
+                <td>{b.clientName}</td>
+                <td>{b.clientPhone || "-"}</td>
                 <td>
-                  <Link
-                    to={`/orcamentos/edit/${b.id}`}
-                    className=""
-                    style={{
-                      padding: '0.25rem 0.5rem',
-                      borderRadius: '0.25rem',
-                      backgroundColor: 'var(--secondary-color)',
-                      color: '#FFF',
-                      textDecoration: 'none',
-                      fontSize: '0.9rem'
-                    }}
+                  {b.totalCost.toLocaleString("pt-BR", {
+                    style: "currency",
+                    currency: "BRL"
+                  })}
+                </td>
+                <td>{new Date(b.createdAt).toLocaleDateString("pt-BR")}</td>
+                <td>
+                  <button
+                    onClick={() => navigate(`/orcamentos/edit/${b.id}`)}
+                    className="btn-edit"
                   >
                     Editar
-                  </Link>
+                  </button>
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
       ) : (
-        <p className="mt-4">Nenhum orçamento encontrado.</p>
+        <p className="no-budgets">Nenhum orçamento encontrado.</p>
       )}
-    </div>
     </div>
   );
 }
