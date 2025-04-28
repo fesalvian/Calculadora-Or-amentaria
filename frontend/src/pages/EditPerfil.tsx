@@ -3,6 +3,8 @@ import React, { useState, useEffect } from "react";
 import api from "../api";
 import BackButton from "../components/BackButton";
 
+
+
 export default function EditPerfil() {
   const [email, setEmail] = useState<string>("");
   const [logoFile, setLogoFile] = useState<File | null>(null);

@@ -38,23 +38,17 @@ export default function HomePage() {
     }
   };
 
-  // Itens estáticos para teste
-const staticItems: Item[] = [
-  { id: 1, name: 'Dobradiça', unit_value: 5.0 },
-  { id: 2, name: 'Corrediça (par)', unit_value: 20.0 },
-  { id: 3, name: 'Pistão', unit_value:15.0 },
-  { id: 4, name: 'Trilho (metro)', unit_value:30.0 }
-];
-
 // Inicializa itens com valores estáticos
 useEffect(() => {
-  setItems(staticItems);
+  api.get<Item[]>('/items')
+  .then(res => setItems(res.data))
+  .catch(err => console.error('Erro ao carregar itens:', err));
 }, []);
 
   // Atualiza valor unitário ao trocar item
   useEffect(() => {
     const it = items.find(i => i.id === selectedId);
-    setUnitValue(it ? it.unit_value : 0);
+    setUnitValue(it ? it.unitValue : 0);
   }, [selectedId, items]);
 
   const handleAdd = (e: FormEvent) => {
@@ -65,7 +59,7 @@ useEffect(() => {
       id: Date.now(),
       item: it,
       quantity,
-      subTotal: parseFloat((it.unit_value * quantity).toFixed(2)),
+      subTotal: parseFloat((it.unitValue * quantity).toFixed(2)),
     };
     setLines(prev => [...prev, newLine]);
     setSelectedId("");

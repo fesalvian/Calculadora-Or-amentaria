@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect, FormEvent } from "react";
 import api from "../api";
-import { Item } from "../types";
+import { Item } from '../types';
 import BackButton from "../components/BackButton";
 
 export default function EditItem() {
@@ -40,7 +40,7 @@ export default function EditItem() {
   // Iniciar edição
   const handleEdit = (item: Item) => {
     setName(item.name);
-    setUnitValue(item.unit_value);
+    setUnitValue(item.unitValue);
     setEditingId(item.id);
   };
 
@@ -78,7 +78,10 @@ export default function EditItem() {
             <input
               type="number"
               value={unitValue}
-              onChange={e => setUnitValue(parseFloat(e.target.value))}
+              onChange={e => {
+                const v = parseFloat(e.target.value);
+                setUnitValue(isNaN(v) ? 0 : v);
+              }}
               placeholder="0.00"
               step="0.01"
               required
@@ -103,7 +106,7 @@ export default function EditItem() {
             {items.map(item => (
               <tr key={item.id}>
                 <td>{item.name}</td>
-                <td>{item.unit_value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</td>
+                <td>{item.unitValue.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</td>
                 <td>
                   <button onClick={() => handleEdit(item)} className="secondary" style={{ marginRight: '0.5rem' }}>
                     Editar
