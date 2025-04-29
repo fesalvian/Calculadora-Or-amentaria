@@ -37,6 +37,7 @@ export default function Orcamentos() {
       </div>
 
       {filtered.length > 0 ? (
+        <div className="table-responsive">
         <table className="budget-table">
           <thead>
             <tr>
@@ -71,6 +72,7 @@ export default function Orcamentos() {
             ))}
           </tbody>
         </table>
+        </div>
       ) : (
         <p className="no-budgets">Nenhum orçamento encontrado.</p>
       )}

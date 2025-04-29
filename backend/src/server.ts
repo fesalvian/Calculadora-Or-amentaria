@@ -20,7 +20,6 @@ app.use(express.json());
 
 // servir logos estaticamente
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
-
 app.use('/auth', authRoutes);
 app.use('/items', authenticate, itemsRoutes);
 app.use('/budgets', authenticate, budgetsRoutes);

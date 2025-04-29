@@ -2,7 +2,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import HomePage from './pages/HomePage';
 import "./css/global.css";
-import "./css/home.css";
 import EditPerfil from './pages/EditPerfil'
 import EditItem   from './pages/EditItem'
 import Orcamentos from './pages/Orcamentos';

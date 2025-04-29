@@ -228,6 +228,45 @@
   }
   
   /* Tabelas responsivas */
+  /* ------------------------------
+   TABELAS RESPONSIVAS
+------------------------------ */
+/* Wrapper para scroll horizontal */
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Estilo base da tabela */
+.table-responsive table {
+  width: 100%;
+  border-collapse: collapse;
+  box-shadow: var(--shadow-card);
+  border-radius: 0.5rem;
+  table-layout: fixed;       /* fixa colunas para alinhamento */
+}
+
+/* Células */
+.table-responsive th,
+.table-responsive td {
+  padding: 0.75rem;
+  text-align: left;
+  border-bottom: 1px solid var(--border-color);
+  word-break: break-word;    /* quebra texto longo */
+}
+
+/* Cabeçalho */
+.table-responsive thead {
+  background-color: var(--secondary-color);
+  color: var(--bg-light);
+}
+
+/* Linhas pares */
+.table-responsive tbody tr:nth-child(even) {
+  background-color: #f0f4fb;
+}
+
   table {
     width: 100%;
     border-collapse: collapse;
@@ -235,7 +274,6 @@
     box-shadow: var(--shadow-card);
     border-radius: 0.5rem;
     overflow: hidden;
-    display: block;
   }
   
   thead {
@@ -243,11 +281,11 @@
     color: var(--bg-light);
     max-width: 100%;
     width: 100%;
-    display: table;
+
   }
 
   tbody{
-    display: table;
+
     max-width: 100%;
     width: 100%;
   }

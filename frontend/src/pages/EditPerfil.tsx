@@ -1,5 +1,5 @@
 // src/pages/EditPerfil.tsx
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import api from "../api";
 import BackButton from "../components/BackButton";
 
@@ -9,6 +9,7 @@ export default function EditPerfil() {
   const [email, setEmail] = useState<string>("");
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
+  const [logoPath, setLogoPath] = useState<string | null>(null);
   const [showPwdForm, setShowPwdForm] = useState<boolean>(false);
   const [currentPwd, setCurrentPwd] = useState<string>("");
   const [newPwd, setNewPwd] = useState<string>("");
@@ -17,16 +18,24 @@ export default function EditPerfil() {
   const [showNew, setShowNew] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [pwdError, setPwdError] = useState<string>("");
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Carrega email do usuário
+  // Carrega email e logo do usuário
   useEffect(() => {
     (async () => {
       try {
-        const res = await api.get<{ email: string }>("/auth/users/me");
-        setEmail(res.data.email);
+        const res = await api.get<{
+          email: string;
+          logoPath: string | null;
+        }>("/auth/users/me");
+        // … setEmail(res.data.email)
+        if (res.data.logoPath) {
+          // monta a URL completa para exibir
+          setLogoPath(res.data.logoPath);
+          setLogoPreview(`${api.defaults.baseURL}${res.data.logoPath}`);
+        }
       } catch (err) {
         console.error("Erro ao buscar perfil:", err);
-        alert("Não foi possível carregar seu perfil. Faça login novamente.");
       }
     })();
   }, []);
@@ -49,10 +58,22 @@ export default function EditPerfil() {
     const formData = new FormData();
     formData.append("logo", logoFile);
     try {
-      await api.post("/auth/users/me/logo", formData, {
-        headers: { "Content-Type": "multipart/form-data" }
-      });
+      const res = await api.post<{ logoPath: string }>(
+        "/auth/users/me/logo",
+        formData,
+        { headers: { "Content-Type": "multipart/form-data" } }
+      );
+      // atualiza o caminho e o preview
+      const newPath = res.data.logoPath;
+      setLogoPath(newPath);
+      setLogoPreview(`${api.defaults.baseURL}${newPath}`);
       alert("Logo atualizada com sucesso.");
+      // limpa o <input type="file" /> para permitir novo upload
+      if (fileInputRef.current) {
+          fileInputRef.current.value = "";
+        }
+        // e zera a logoFile pra não re-enviar acidentalmente
+        setLogoFile(null)
     } catch {
       alert("Erro ao atualizar logo.");
     }
@@ -322,6 +343,7 @@ export default function EditPerfil() {
           type="file"
           accept="image/png"
           onChange={handleLogoChange}
+          ref={fileInputRef}
           style={{ display: 'block', marginTop: '0.5rem' }}
         />
         {logoPreview && (

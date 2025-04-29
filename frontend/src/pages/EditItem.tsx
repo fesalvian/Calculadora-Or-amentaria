@@ -94,6 +94,8 @@ export default function EditItem() {
       </form>
 
       {items.length > 0 && (
+        <div className="table-responsive" style={{ marginTop: '1.5rem' }}>
+          <h2>Itens Cadastrados</h2>
         <table style={{ marginTop: '1.5rem' }}>
           <thead>
             <tr>
@@ -119,6 +121,7 @@ export default function EditItem() {
             ))}
           </tbody>
         </table>
+        </div>
       )}
     </div>
   );

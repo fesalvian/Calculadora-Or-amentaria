@@ -41,7 +41,7 @@ export default function ItemForm({ onAdd }: Props) {
       </div>
       <button
         type="submit"
-        className="bg-blue-500 text-white px-4 py-1 rounded"
+        className="buttonMobile"
       >
         Adicionar Item
       </button>

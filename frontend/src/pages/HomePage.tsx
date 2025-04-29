@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef, FormEvent } from "react";
 import api from "../api";
 import { Item } from "../types";
 import { Link, useNavigate } from 'react-router-dom';
+import "../css/home.css";
 
 interface BudgetLine {
   id: number;
@@ -281,14 +282,15 @@ function handleLogout() {
           </div>
         </div>
 
-        <button type="submit" className="primary mt-4">
+        <button type="submit" className="buttonMobile">
           Adicionar
         </button>
       </form>
 
       {lines.length > 0 && (
         <>
-          <table className="mt-6">
+        <div className="table-responsive mt-6">
+          <table>
             <thead>
               <tr>
                 <th>Item</th>
@@ -315,6 +317,7 @@ function handleLogout() {
               ))}
             </tbody>
           </table>
+          </div>
 
           <div className="flex flex-wrap justify-between gap-4 mt-4">
   <button onClick={handleSave} className="secondary flex flex-col items-center">
