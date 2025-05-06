@@ -1,0 +1,71 @@
+
+/* 1) Wrapper para scroll horizontal suave em mobile */
+.table-responsive {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* 2) Estilo base da tabela */
+  .table-responsive table {
+    width: 100%;
+    min-width: 600px;     /* garante colunas mínimas em mobile */
+    border-collapse: collapse;
+  }
+  
+  /* 3) Cabeçalho e células */
+  .table-responsive th,
+  .table-responsive td {
+    padding: 0.75rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+    white-space: nowrap;  /* evita quebra de linha dentro de células */
+  }
+  
+  /* 4) Zebra striping para facilitar a leitura */
+  .table-responsive tbody tr:nth-child(even) {
+    background-color: #f0f4fb;
+  }
+  
+  /* 5) Em telas muito estreitas, empilha as linhas como cards */
+  @media (max-width: 480px) {
+    .table-responsive table,
+    .table-responsive thead,
+    .table-responsive tbody,
+    .table-responsive th,
+    .table-responsive td,
+    .table-responsive tr {
+      display: block;
+    }
+    /* esconde o cabeçalho original */
+    .table-responsive thead tr {
+      position: absolute;
+      top: -9999px;
+      left: -9999px;
+    }
+    .table-responsive tr {
+      margin: 0 0 1rem 0;
+      border: 1px solid var(--border-color);
+      border-radius: 0.5rem;
+      padding: 0.5rem;
+    }
+    .table-responsive td {
+      border: none;
+      position: relative;
+      padding-left: 50%;
+      white-space: normal;
+    }
+    /* insere o label de cada célula antes do seu valor */
+    .table-responsive td:before {
+      position: absolute;
+      top: 50%;
+      left: 0.75rem;
+      transform: translateY(-50%);
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    .table-responsive td:nth-of-type(1):before { content: "Item"; }
+    .table-responsive td:nth-of-type(2):before { content: "Quantidade"; }
+    .table-responsive td:nth-of-type(3):before { content: "Valor total"; }
+    }
+  

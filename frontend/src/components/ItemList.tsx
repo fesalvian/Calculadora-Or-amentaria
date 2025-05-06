@@ -15,7 +15,7 @@ export default function ItemList({ items, onDelete }: Props) {
       {items.map((item) => (
         <li key={item.id} className="flex justify-between p-2">
           <span>
-            {item.name} — R${item.unit_value.toFixed(2)}
+            {item.name} — R${item.unitValue.toFixed(2)}
           </span>
           <button
             onClick={() => onDelete(item.id)}

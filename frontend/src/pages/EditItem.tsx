@@ -3,6 +3,10 @@ import React, { useState, useEffect, FormEvent } from "react";
 import api from "../api";
 import { Item } from '../types';
 import BackButton from "../components/BackButton";
+import "../css/global.css";
+import "../css/home.css";
+import "../css/tabelaEditItems.css";
+
 
 export default function EditItem() {
   const [items, setItems] = useState<Item[]>([]);
@@ -96,7 +100,7 @@ export default function EditItem() {
       {items.length > 0 && (
         <div className="table-responsive" style={{ marginTop: '1.5rem' }}>
           <h2>Itens Cadastrados</h2>
-        <table style={{ marginTop: '1.5rem' }}>
+        <table  className="items-table" style={{ marginTop: '1.5rem' }}>
           <thead>
             <tr>
               <th>Nome</th>

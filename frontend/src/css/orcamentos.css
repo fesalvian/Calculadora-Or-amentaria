@@ -54,3 +54,80 @@
     color: var(--text-color);
   }
   
+  /* orcamentos.css */
+
+/* 1) Wrapper para scroll horizontal suave em mobile */
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* 2) Base da tabela */
+.table-responsive .budget-table {
+  width: 100%;
+  min-width: 600px;             /* garante colunas mínimas em mobile */
+  border-collapse: collapse;
+  box-shadow: var(--shadow-card);
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+
+/* 3) Cabeçalho e células */
+.table-responsive .budget-table th,
+.table-responsive .budget-table td {
+  padding: 0.75rem;
+  text-align: left;
+  border-bottom: 1px solid var(--border-color);
+  white-space: nowrap;
+}
+
+/* 4) Zebra striping */
+.table-responsive .budget-table tbody tr:nth-child(even) {
+  background-color: #f0f4fb;
+}
+
+/* 5) Layout “cards” em telas muito estreitas */
+@media (max-width: 480px) {
+  .table-responsive .budget-table,
+  .table-responsive .budget-table thead,
+  .table-responsive .budget-table tbody,
+  .table-responsive .budget-table th,
+  .table-responsive .budget-table td,
+  .table-responsive .budget-table tr {
+    display: block;
+  }
+  /* esconde cabeçalho original */
+  .table-responsive .budget-table thead tr {
+    position: absolute;
+    top: -9999px;
+    left: -9999px;
+  }
+  /* estilo de “card” para cada linha */
+  .table-responsive .budget-table tr {
+    margin: 0 0 1rem 0;
+    border: 1px solid var(--border-color);
+    border-radius: 0.5rem;
+    padding: 0.5rem;
+  }
+  /* cada célula vira linha, com label antes do valor */
+  .table-responsive .budget-table td {
+    border: none;
+    position: relative;
+    padding-left: 50%;
+    white-space: normal;
+  }
+  .table-responsive .budget-table td:before {
+    position: absolute;
+    top: 50%;
+    left: 0.75rem;
+    transform: translateY(-50%);
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .table-responsive .budget-table td:nth-of-type(1):before { content: "Cliente"; }
+  .table-responsive .budget-table td:nth-of-type(2):before { content: "Telefone"; }
+  .table-responsive .budget-table td:nth-of-type(3):before { content: "Total"; }
+  .table-responsive .budget-table td:nth-of-type(4):before { content: "Data"; }
+  .table-responsive .budget-table td:nth-of-type(5):before { content: "Ações"; }
+}

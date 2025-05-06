@@ -1,0 +1,83 @@
+/* wrapper que você já tem */
+.table-responsive {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* força a tabela a voltar a se comportar como tabela */
+  .table-responsive table {
+    display: table !important;
+    width: 100% !important;
+    border-collapse: collapse;
+  }
+  
+  /* cabeçalho */
+  .table-responsive table thead {
+    display: table-header-group !important;
+    background-color: var(--secondary-color);
+    color: var(--bg-light);
+  }
+  
+  /* corpo */
+  .table-responsive table tbody {
+    display: table-row-group !important;
+  }
+  
+  /* células */
+  .table-responsive table th,
+  .table-responsive table td {
+    padding: 0.75rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+    white-space: nowrap;
+  }
+  
+  /* zebra */
+  .table-responsive table tbody tr:nth-child(even) {
+    background-color: #f0f4fb;
+  }
+  
+  /* -- MOBILE LAYOUT (cards) -- */
+  @media (max-width: 480px) {
+    .table-responsive table,
+    .table-responsive table thead,
+    .table-responsive table tbody,
+    .table-responsive table th,
+    .table-responsive table td,
+    .table-responsive table tr {
+      display: block;
+    }
+  
+    /* esconde o thead */
+    .table-responsive table thead tr {
+      position: absolute;
+      top: -9999px;
+      left: -9999px;
+    }
+  
+    .table-responsive table tr {
+      margin-bottom: 1rem;
+      border: 1px solid var(--border-color);
+      border-radius: 0.5rem;
+      padding: 0.5rem;
+    }
+  
+    .table-responsive table td {
+      position: relative;
+      padding-left: 50%;
+      border: none;
+      white-space: normal;
+    }
+  
+    .table-responsive table td:before {
+      position: absolute;
+      top: 50%;
+      left: 0.75rem;
+      transform: translateY(-50%);
+      font-weight: 600;
+      content: attr(data-label);
+      white-space: nowrap;
+    }
+  }
+  

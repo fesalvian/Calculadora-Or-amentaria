@@ -4,6 +4,9 @@ import api from "../api";
 import { Item } from "../types";
 import { Link, useNavigate } from 'react-router-dom';
 import "../css/home.css";
+import "../css/tabelasHome.css"
+import "../css/responsive-tables.css";
+
 
 interface BudgetLine {
   id: number;
@@ -302,10 +305,10 @@ function handleLogout() {
             <tbody>
               {lines.map(l => (
                 <tr key={l.id}>
-                  <td>{l.item.name}</td>
-                  <td>{l.quantity}</td>
-                  <td>{formatCurrency(l.subTotal)}</td>
-                  <td>
+                  <td data-label="Item">{l.item.name}</td>
+                  <td data-label="Qtd">{l.quantity}</td>
+                  <td data-label="Subtotal">{formatCurrency(l.subTotal)}</td>
+                  <td data-label="Ações">
                     <button onClick={() => handleEdit(l)} className="secondary mr-2">
                       Editar
                     </button>
