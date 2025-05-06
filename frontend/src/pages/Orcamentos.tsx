@@ -12,7 +12,8 @@ export default function Orcamentos() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    api.get<Budget[]>("/budgets")
+    api
+      .get<Budget[]>("/budgets")
       .then(res => setBudgets(res.data))
       .catch(err => console.error("Erro ao carregar orçamentos:", err));
   }, []);
@@ -21,9 +22,28 @@ export default function Orcamentos() {
     b.clientName.toLowerCase().includes(search.toLowerCase())
   );
 
+  const handleEdit = (id: number) => {
+        navigate("/", { state: { editingBudgetId: id } });
+      };
+    
+      // exclui orçamento via API e atualiza lista
+      const handleDelete = async (id: number) => {
+        if (!window.confirm("Deseja excluir este orçamento?")) return;
+        try {
+          await api.delete(`/budgets/${id}`);
+          setBudgets(bs => bs.filter(b => b.id !== id));
+        } catch (err: any) {
+          // se tiver linhas ainda, instrua o usuário a removê-las primeiro
+          alert(
+            err.response?.data?.message ||
+            "Erro ao excluir. Remova primeiro as linhas do orçamento."
+          );
+        }
+      };
+
   return (
     <div className="orcamentos-container">
-      <BackButton/>
+      <BackButton />
       <h1 className="page-title">Orçamentos Salvos</h1>
 
       <div className="search-wrapper">
@@ -38,40 +58,48 @@ export default function Orcamentos() {
 
       {filtered.length > 0 ? (
         <div className="table-responsive">
-        <table className="budget-table">
-          <thead>
-            <tr>
-              <th>Cliente</th>
-              <th>Telefone</th>
-              <th>Total</th>
-              <th>Data</th>
-              <th>Ações</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filtered.map(b => (
-              <tr key={b.id}>
-                <td>{b.clientName}</td>
-                <td>{b.clientPhone || "-"}</td>
-                <td>
-                  {b.totalCost.toLocaleString("pt-BR", {
-                    style: "currency",
-                    currency: "BRL"
-                  })}
-                </td>
-                <td>{new Date(b.createdAt).toLocaleDateString("pt-BR")}</td>
-                <td>
-                  <button
-                    onClick={() => navigate(`/orcamentos/edit/${b.id}`)}
-                    className="btn-edit"
-                  >
-                    Editar
-                  </button>
-                </td>
+          <table className="budget-table">
+            <thead>
+              <tr>
+                <th>Cliente</th>
+                <th>Telefone</th>
+                <th>Total</th>
+                <th>Data</th>
+                <th>Ações</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {filtered.map(b => (
+                <tr key={b.id}>
+                  <td data-label="Cliente">{b.clientName}</td>
+                  <td data-label="Telefone">{b.clientPhone || "-"}</td>
+                  <td data-label="Total">
+                    {b.totalCost.toLocaleString("pt-BR", {
+                      style: "currency",
+                      currency: "BRL"
+                    })}
+                  </td>
+                  <td data-label="Data">
+                    {new Date(b.createdAt).toLocaleDateString("pt-BR")}
+                  </td>
+                  <td data-label="Ações">
+                    <button
+                      onClick={() => handleEdit(b.id)}
+                      className="btn-edit"
+                    >
+                      Editar
+                    </button>
+                    <button
+                      onClick={() => handleDelete(b.id)}
+                      className="danger"
+                    >
+                      Excluir
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       ) : (
         <p className="no-budgets">Nenhum orçamento encontrado.</p>

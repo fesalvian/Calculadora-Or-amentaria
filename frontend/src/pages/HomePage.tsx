@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useRef, FormEvent } from "react";
 import api from "../api";
 import { Item } from "../types";
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import "../css/home.css";
 import "../css/tabelasHome.css"
 import "../css/responsive-tables.css";
@@ -26,20 +26,24 @@ export default function HomePage() {
   const [open, setOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
+  const navigate = useNavigate();
+  const location = useLocation();
+  // pega o ID do orçamento que veio de Orcamentos
+  const { editingBudgetId } =
+    (location.state as { editingBudgetId?: number }) || {};
+
+
   // Formata valor para R$00,00
   const formatCurrency = (value: number) =>
     value.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
-
-  // Formata telefone (##) #####-#### ou (##) ####-####
   const formatPhone = (value: string) => {
-    const digits = value.replace(/\D/g, "").slice(0, 11);
-    if (digits.length > 10) {
-      const parts = digits.match(/(\d{2})(\d{5})(\d{0,4})/);
-      return parts ? `(${parts[1]}) ${parts[2]}-${parts[3]}`.trim() : digits;
-    } else {
-      const parts = digits.match(/(\d{2})(\d{4})(\d{0,4})/);
-      return parts ? `(${parts[1]}) ${parts[2]}-${parts[3]}`.trim() : digits;
+    const d = value.replace(/\D/g, "").slice(0, 11);
+    if (d.length > 10) {
+      const p = d.match(/(\d{2})(\d{5})(\d{0,4})/);
+      return p ? `(${p[1]}) ${p[2]}-${p[3]}`.trim() : d;
     }
+    const p = d.match(/(\d{2})(\d{4})(\d{0,4})/);
+    return p ? `(${p[1]}) ${p[2]}-${p[3]}`.trim() : d;
   };
 
 // Inicializa itens com valores estáticos
@@ -48,6 +52,40 @@ useEffect(() => {
   .then(res => setItems(res.data))
   .catch(err => console.error('Erro ao carregar itens:', err));
 }, []);
+
+  // Carrega orçamento para edição, se houver
+  useEffect(() => {
+    if (editingBudgetId) {
+      api
+        .get<{
+          client_name: string;
+          client_phone: string;
+          items: {
+            id: number;
+            item: { id: number; name: string; unit_value: number };
+            quantity: number;
+            subTotal: number;
+          }[];
+        }>(`/budgets/${editingBudgetId}`)
+        .then(res => {
+          setClientName(res.data.client_name);
+          setClientPhone(res.data.client_phone || "");
+          setLines(
+            res.data.items.map(l => ({
+              id: l.id,
+              item: {
+                id: l.item.id,
+                name: l.item.name,
+                unitValue: l.item.unit_value
+              },
+              quantity: l.quantity,
+              subTotal: l.subTotal
+            }))
+          );
+        })
+        .catch(err => console.error("Erro ao carregar orçamento:", err));
+    }
+  }, [editingBudgetId]);
 
   // Atualiza valor unitário ao trocar item
   useEffect(() => {
@@ -83,32 +121,38 @@ useEffect(() => {
   const totalCost = lines.reduce((sum, l) => sum + l.subTotal, 0);
 
    // Salva orçamento na API
-  const handleSave = async () => {
+   const handleSave = async () => {
+    const payload = {
+      client_name: clientName,
+      client_phone: clientPhone,
+      total_cost: totalCost,
+      items: lines.map(l => ({
+        itemId: l.item.id,
+        quantity: l.quantity,
+        subTotal: l.subTotal,
+      })),
+    };
+
     try {
-      const payload = {
-        client_name: clientName,
-        client_phone: clientPhone,
-        total_cost: totalCost,
-        items: lines.map(l => ({
-          itemId: l.item.id,
-          quantity: l.quantity,
-          subTotal: l.subTotal,
-        })),
-      };
-      const res = await api.post('/budgets', payload);
-      if (res.status === 200 || res.status === 201) {
-        alert('Orçamento salvo com sucesso!');
-        // limpa formulário
-        setClientName('');
-        setClientPhone('');
-        setLines([]);
+      if (editingBudgetId) {
+        // atualizar
+        await api.put(`/budgets/${editingBudgetId}`, payload);
+        alert("Orçamento atualizado com sucesso!");
       } else {
-        alert('Erro ao salvar orçamento.');
+        // criar novo
+        await api.post("/budgets", payload);
+        alert("Orçamento salvo com sucesso!");
       }
+      // limpa estado e remove flag de edição
+      setClientName("");
+      setClientPhone("");
+      setLines([]);
+      navigate("/", { replace: true, state: {} });
     } catch (err) {
-      console.error('Erro ao salvar orçamento:', err);
-      alert('Erro ao salvar orçamento.');
-    }};
+      console.error(err);
+      alert("Erro ao salvar orçamento.");
+    }
+  };
 
     const handleExportExcel = async () => {
       try {
