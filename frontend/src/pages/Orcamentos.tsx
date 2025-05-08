@@ -8,14 +8,13 @@ import { Budget } from "../types";
 
 export default function Orcamentos() {
   const [budgets, setBudgets] = useState<Budget[]>([]);
-  const [search, setSearch] = useState<string>("");
-  const navigate = useNavigate();
+  const [search, setSearch]   = useState("");
+  const navigate              = useNavigate();
 
   useEffect(() => {
-    api
-      .get<Budget[]>("/budgets")
-      .then(res => setBudgets(res.data))
-      .catch(err => console.error("Erro ao carregar orçamentos:", err));
+    api.get<Budget[]>("/budgets")
+       .then(res => setBudgets(res.data))
+       .catch(err => console.error("Erro ao carregar orçamentos:", err));
   }, []);
 
   const filtered = budgets.filter(b =>
@@ -23,23 +22,22 @@ export default function Orcamentos() {
   );
 
   const handleEdit = (id: number) => {
-        navigate("/", { state: { editingBudgetId: id } });
-      };
-    
-      // exclui orçamento via API e atualiza lista
-      const handleDelete = async (id: number) => {
-        if (!window.confirm("Deseja excluir este orçamento?")) return;
-        try {
-          await api.delete(`/budgets/${id}`);
-          setBudgets(bs => bs.filter(b => b.id !== id));
-        } catch (err: any) {
-          // se tiver linhas ainda, instrua o usuário a removê-las primeiro
-          alert(
-            err.response?.data?.message ||
-            "Erro ao excluir. Remova primeiro as linhas do orçamento."
-          );
-        }
-      };
+    // Passa apenas o flag — a HomePage vai buscar TODOS os orçamentos
+    navigate("/", { state: { viewBudgets: true } });
+  };
+
+  const handleDelete = async (id: number) => {
+    if (!window.confirm("Deseja excluir este orçamento?")) return;
+    try {
+      await api.delete(`/budgets/${id}`);
+      setBudgets(bs => bs.filter(b => b.id !== id));
+    } catch (err: any) {
+      alert(
+        err.response?.data?.message ||
+        "Erro ao excluir. Remova primeiro as linhas do orçamento."
+      );
+    }
+  };
 
   return (
     <div className="orcamentos-container">
@@ -76,7 +74,7 @@ export default function Orcamentos() {
                   <td data-label="Total">
                     {b.totalCost.toLocaleString("pt-BR", {
                       style: "currency",
-                      currency: "BRL"
+                      currency: "BRL",
                     })}
                   </td>
                   <td data-label="Data">

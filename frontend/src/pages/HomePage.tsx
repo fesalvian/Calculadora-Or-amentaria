@@ -54,38 +54,32 @@ useEffect(() => {
 }, []);
 
   // Carrega orçamento para edição, se houver
-  useEffect(() => {
-    if (editingBudgetId) {
-      api
-        .get<{
-          client_name: string;
-          client_phone: string;
-          items: {
-            id: number;
-            item: { id: number; name: string; unit_value: number };
-            quantity: number;
-            subTotal: number;
-          }[];
-        }>(`/budgets/${editingBudgetId}`)
-        .then(res => {
-          setClientName(res.data.client_name);
-          setClientPhone(res.data.client_phone || "");
-          setLines(
-            res.data.items.map(l => ({
-              id: l.id,
-              item: {
-                id: l.item.id,
-                name: l.item.name,
-                unitValue: l.item.unit_value
-              },
-              quantity: l.quantity,
-              subTotal: l.subTotal
-            }))
-          );
-        })
-        .catch(err => console.error("Erro ao carregar orçamento:", err));
-    }
-  }, [editingBudgetId]);
+    useEffect(() => {
+        if (!editingBudgetId) return;
+        api
+          .get<any>(`/budgets/${editingBudgetId}`)
+          .then(res => {
+            const data = res.data;
+            setClientName(data.client_name);
+            setClientPhone(data.client_phone || "");
+           // protege caso o backend retorne items sem o campo item
+            const rawItems = Array.isArray(data.items) ? data.items : [];
+            setLines(
+              rawItems.map((l: any) => ({
+                id: l.id,
+                item: {
+                  id: l.item?.id,
+                  name: l.item?.name,
+                unitValue: l.item?.unit_value ?? l.item?.unitValue ?? 0,
+                },
+                quantity: l.quantity,
+                subTotal: l.subTotal,
+              }))
+            );
+          })
+          .catch(err => console.error("Erro ao carregar orçamento:", err));
+      }, [editingBudgetId]);
+  
 
   // Atualiza valor unitário ao trocar item
   useEffect(() => {
@@ -121,7 +115,7 @@ useEffect(() => {
   const totalCost = lines.reduce((sum, l) => sum + l.subTotal, 0);
 
    // Salva orçamento na API
-   const handleSave = async () => {
+    const handleSave = async () => {
     const payload = {
       client_name: clientName,
       client_phone: clientPhone,
@@ -179,7 +173,7 @@ useEffect(() => {
         alert('Erro ao exportar Excel');
       }
     };
-   
+    
     const handleExportPDF = async () => {
       try {
         const payload = {

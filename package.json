@@ -1,0 +1,12 @@
+{
+  "name": "my-app",
+  "private": true,
+  "scripts": {
+    "client": "cd frontend && npm run dev",
+    "server": "cd backend && npm run dev",
+    "dev": "concurrently \"npm:server\" \"npm:client\""
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}

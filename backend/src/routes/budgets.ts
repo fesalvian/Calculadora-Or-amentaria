@@ -1,26 +1,26 @@
-// src/routes/budgets.ts
-import { Router, RequestHandler, Response, NextFunction } from 'express';
-import { PrismaClient } from '@prisma/client';
+import { Router, RequestHandler, Response } from 'express';
+import { PrismaClient }         from '@prisma/client';
 import { authenticate, AuthRequest } from '../middleware/auth';
 
 const prisma = new PrismaClient();
 const router = Router();
 
+// todas as rotas abaixo exigem autenticação
 router.use(authenticate);
 
-// wrapper para usar AuthRequest sem conflito de tipos
-function authHandler(
+// wrapper para capturar erros de async/await
+function wrap(
   fn: (req: AuthRequest, res: Response) => Promise<any>
 ): RequestHandler {
   return (req, res, next) => {
-    Promise.resolve(fn(req as AuthRequest, res)).catch(next);
+    fn(req as AuthRequest, res).catch(next);
   };
 }
 
-// POST /budgets — cria um orçamento
+// cria um orçamento
 router.post(
   '/',
-  authHandler(async (req, res) => {
+  wrap(async (req, res) => {
     const { client_name, client_phone, items, total_cost } = req.body;
     const userId = req.userId!;
 
@@ -38,75 +38,85 @@ router.post(
           }))
         }
       },
-      include: { items: true }
+      include: {
+        // não precisamos aqui incluir o 'item' — o front só usa GET /:id
+        items: true
+      }
     });
 
-    res.status(201).json(budget);
+    return res.status(201).json(budget);
   })
 );
 
-// GET /budgets — lista todos os orçamentos do usuário
+// lista todos os orçamentos do usuário
 router.get(
   '/',
-  authHandler(async (req, res) => {
+  wrap(async (req, res) => {
     const userId = req.userId!;
     const budgets = await prisma.budget.findMany({
       where: { userId }
     });
-    res.json(budgets);
+    return res.json(budgets);
   })
 );
 
-// GET /budgets/:id — retorna um orçamento específico
+// busca um orçamento específico, incluindo linhas e cada item
 router.get(
   '/:id',
-  authHandler(async (req, res) => {
+  wrap(async (req, res) => {
     const userId = req.userId!;
-    const id = Number(req.params.id);
+    const id     = Number(req.params.id);
     if (isNaN(id)) {
-      res.status(400).json({ message: 'ID inválido.' });
-      return;
+      return res.status(400).json({ message: 'ID inválido.' });
     }
 
     const budget = await prisma.budget.findUnique({
       where: { id },
-      include: { items: true }
+      include: {
+        items: {
+          include: { item: true }    // garante que "l.item" não seja undefined
+        }
+      }
     });
 
     if (!budget || budget.userId !== userId) {
-      res.status(404).json({ message: 'Orçamento não encontrado.' });
-      return;
+      return res.status(404).json({ message: 'Orçamento não encontrado.' });
     }
 
-    res.json(budget);
-  })
-);
-
-// DELETE /budgets/items/:itemId — remove linha de orçamento individualmente
-router.delete(
-  '/items/:itemId',
-  authHandler(async (req, res) => {
-    const userId  = req.userId!;
-    const itemId  = Number(req.params.itemId);
-    if (isNaN(itemId)) {
-      res.status(400).json({ message: 'ID de item inválido.' });
-      return;
-    }
-
-    // garante que essa linha pertence a um orçamento seu
-    const linha = await prisma.budgetItem.findUnique({
-      where: { id: itemId },
-      select: { budget: { select: { userId: true } } }
+    // monta o JSON exatamente como o front espera
+    return res.json({
+      client_name:  budget.clientName,
+      client_phone: budget.clientPhone,
+      items: budget.items.map(l => ({
+        id:       l.id,
+        item: {
+          id:         l.item.id,
+          name:       l.item.name,
+          unit_value: l.item.unitValue
+        },
+        quantity: l.quantity,
+        subTotal: l.subTotal
+      }))
     });
-    if (!linha || linha.budget.userId !== userId) {
-      res.status(404).json({ message: 'Linha não encontrada.' });
-      return;
-    }
-
-    await prisma.budgetItem.delete({ where: { id: itemId } });
-    res.sendStatus(204);
   })
 );
 
+// exclui um orçamento inteiro
+router.delete(
+  '/:id',
+  wrap(async (req, res) => {
+    const userId = req.userId!;
+    const id     = Number(req.params.id);
+    if (isNaN(id)) {
+      return res.status(400).json({ message: 'ID inválido.' });
+    }
+
+    await prisma.budget.deleteMany({
+      where: { id, userId }
+    });
+
+    return res.sendStatus(204);
+  })
+);
 
 export default router;
